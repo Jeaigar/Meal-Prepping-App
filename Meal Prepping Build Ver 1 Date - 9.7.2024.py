@@ -84,7 +84,7 @@ def enable_high_dpi_awareness():
 root = ctk.CTk()
 root.title("MealCraft")
 root.geometry("400x600")  # Adjusted window size
-root.iconbitmap(r"E:/School/SDEV Group/appicon.ico")
+root.iconbitmap(r"appicon.ico")
 
 # Enable DPI scaling
 enable_high_dpi_awareness()
