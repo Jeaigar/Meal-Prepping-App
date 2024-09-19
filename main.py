@@ -1,9 +1,10 @@
-from CTkMessagebox import CTkMessagebox
+from tkinter import messagebox
+from subprocess import call
+from CTkMessagebox import CTkMessagebox, ctkmessagebox
 import customtkinter as ctk
-import tkinter as tk
-from tkinter import ttk, messagebox
 import random
-# HELLOOOO
+from customtkinter import CTkButton
+
 # Food, sides, and drinks corresponding to each diet
 food_options = {
     "None": ["Pizza", "Burger", "Burrito"],
@@ -60,17 +61,6 @@ def display_matching_foods():
     else:
         food_list_label.config(text="No foods available for this diet.")
 
-##### -- UNNEEDED WHEN USING CUSTOMTKINTER -- ##
-# Enable dark mode theme
-# def set_dark_mode():
-#     root.tk_setPalette(background="#2E2E2E", foreground="#FFFFFF", activeBackground="#505050", activeForeground="#FFFFFF")
-#     root.configure(bg="#2E2E2E")
-#     style = ttk.Style()
-#     style.theme_use("clam")
-#     style.configure("TLabel", background="#2E2E2E", foreground="white")
-#     style.configure("TButton", background="#505050", foreground="white")
-#     style.configure("TCombobox", fieldbackground="#505050", background="#505050", foreground="white")
-
 
 # Enable DPI awareness for better resolution on high-DPI displays
 def enable_high_dpi_awareness():
@@ -80,11 +70,21 @@ def enable_high_dpi_awareness():
         pass
 
 
+def logout():
+    messagebox.showinfo("Logout", "Logging out...")
+
+    root.destroy()
+
+    call(["python", "login.py"])
+
+
 # Create the main window
 root = ctk.CTk()
 root.title("MealCraft")
 root.geometry("400x600")  # Adjusted window size
 root.iconbitmap(r"appicon.ico")
+root.resizable(False, False)
+root.eval("tk::PlaceWindow . center")
 
 # Enable DPI scaling
 enable_high_dpi_awareness()
@@ -92,6 +92,10 @@ enable_high_dpi_awareness()
 # Set dark mode
 # set_dark_mode()
 ctk.set_appearance_mode("dark")
+
+# BUTTON THAT ALLOWS USER TO SIGN OUT OF THEIR ACCOUNT
+sign_out = CTkButton(root, text="Sign Out", command=logout, height=30, width=20, fg_color='dark red')
+sign_out.place(anchor='nw')
 
 # Dropdown for selecting the day of the week
 ctk.CTkLabel(root, text="Select Day of the Week:").pack(pady=5)
@@ -141,5 +145,4 @@ food_list_label.pack(fill="both", expand=True, padx=10, side="left")
 
 
 # Start the Tkinter loop
-if __name__ == '__main__':
-    root.mainloop()
+root.mainloop()
