@@ -78,7 +78,7 @@ def loginuser(event):
         # print(myresult)
         # print(f'Password : {fetched_password}')
 
-        if myresult == None:
+        if myresult is None:
 
             CTkMessagebox(title="Error", message="Username doesn't exist!", icon='warning', sound=True)
 
@@ -101,7 +101,9 @@ def loginuser(event):
 # ADDS SHARPNESS TO UI ON HIGH-RESOLUTION SCREENS
 def enable_high_dpi_awareness():
     try:
+
         login.tk.call('tk', 'scaling', 2.0)
+
     except:
         pass
 
@@ -119,7 +121,6 @@ login.eval("tk::PlaceWindow . center")
 
 # Enable DPI scaling
 enable_high_dpi_awareness()
-
 
 
 # Set dark mode
@@ -190,7 +191,6 @@ login_button.place(x=129, y=380)
 # CREATES AND PLACES THE REGISTER BUTTON
 register_button = ctk.CTkButton(login, text="Register", font=("Arial", 20), fg_color="#FF8433", hover_color="#FF6500", command=register)
 register_button.place(x=129, y=420)
-
 
 
 login.mainloop()
