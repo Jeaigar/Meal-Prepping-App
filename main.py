@@ -1,9 +1,12 @@
+import sqlite3
 from tkinter import messagebox
 from subprocess import call
 from CTkMessagebox import CTkMessagebox, ctkmessagebox
 import customtkinter as ctk
 import random
 from customtkinter import CTkButton
+from PIL import Image, ImageTk
+
 
 # Food, sides, and drinks corresponding to each diet
 food_options = {
@@ -81,7 +84,7 @@ def logout():
 # Create the main window
 root = ctk.CTk()
 root.title("MealCraft")
-root.geometry("400x600")  # Adjusted window size
+root.geometry("700x600")  # Adjusted window size
 root.iconbitmap(r"appicon.ico")
 root.resizable(False, False)
 root.eval("tk::PlaceWindow . center")
@@ -93,9 +96,15 @@ enable_high_dpi_awareness()
 # set_dark_mode()
 ctk.set_appearance_mode("dark")
 
+
+account_icon = ctk.CTkImage(Image.open("account_icon.png"))
+account_icon._size = 150, 100
+account_icon_label = ctk.CTkLabel(root, image=account_icon, text='')
+account_icon_label.place(anchor='nw', y=20)
+
 # BUTTON THAT ALLOWS USER TO SIGN OUT OF THEIR ACCOUNT
 sign_out = CTkButton(root, text="Sign Out", command=logout, height=30, width=20, fg_color='dark red')
-sign_out.place(anchor='nw')
+sign_out.place(anchor='nw', y=140, x=45)
 
 # Dropdown for selecting the day of the week
 ctk.CTkLabel(root, text="Select Day of the Week:").pack(pady=5)
@@ -145,4 +154,5 @@ food_list_label.pack(fill="both", expand=True, padx=10, side="left")
 
 
 # Start the Tkinter loop
-root.mainloop()
+if __name__ == '__main__':
+    root.mainloop()
