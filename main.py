@@ -46,8 +46,17 @@ def finalize_meal():
     selected_meal = meal_var.get()
     selected_side = side_var.get()
     selected_drink = drink_var.get()
+    selected_day = day_var.get()  # Get the selected day
     if selected_meal and selected_side and selected_drink:
-        CTkMessagebox(title="Finalized Meal", message=f"Meal: {selected_meal}\nSide: {selected_side}\nDrink: {selected_drink}")
+        # Save the selection to the corresponding day
+        meal_schedule[selected_day] = {
+            "meal": selected_meal,
+            "side": selected_side,
+            "drink": selected_drink
+        }
+        # Update the label for the selected day
+        day_labels[selected_day].configure(text=f"{selected_day}: {selected_meal}, {selected_side}, {selected_drink}")
+        CTkMessagebox(title="Finalized Meal", message=f"Meal saved for {selected_day}:\nMeal: {selected_meal}\nSide: {selected_side}\nDrink: {selected_drink}")
     else:
         CTkMessagebox(title="Error", message="Please select a meal, side, and drink", icon='warning')
 
@@ -84,7 +93,7 @@ def logout():
 # Create the main window
 root = ctk.CTk()
 root.title("MealCraft")
-root.geometry("700x600")  # Adjusted window size
+root.geometry("1000x600")  # Adjusted window size
 root.iconbitmap(r"appicon.ico")
 root.resizable(False, False)
 root.eval("tk::PlaceWindow . center")
@@ -105,6 +114,7 @@ account_icon_label.place(anchor='nw', y=20)
 # BUTTON THAT ALLOWS USER TO SIGN OUT OF THEIR ACCOUNT
 sign_out = CTkButton(root, text="Sign Out", command=logout, height=30, width=20, fg_color='dark red')
 sign_out.place(anchor='nw', y=140, x=45)
+
 
 # Dropdown for selecting the day of the week
 ctk.CTkLabel(root, text="Select Day of the Week:").pack(pady=5)
@@ -151,7 +161,24 @@ food_list_label.pack(fill="both", expand=True, padx=10, side="left")
 # Update food list when diet is selected
 # diet_menu.bind("<<ComboboxSelected>>", lambda event: display_matching_foods())
 
+# List to store meal selections for each day
+meal_schedule = {day: None for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
 
+# Create a dictionary to hold labels for each day
+day_labels = {}
+
+# Create a frame for the days of the week
+days_frame = ctk.CTkFrame(root)
+days_frame.place(relx=0.65, rely=0.1, anchor='nw')  # Adjust 'rely' to position higher
+
+# Label for days of the week
+ctk.CTkLabel(days_frame, text="Days of the Week:").pack(pady=5)
+
+# Display the days of the week and create labels for each day
+for day in meal_schedule.keys():
+    day_label = ctk.CTkLabel(days_frame, text=f"{day}: -not set-")
+    day_label.pack(anchor="w")
+    day_labels[day] = day_label  # Store the label in the dictionary
 
 # Start the Tkinter loop
 if __name__ == '__main__':
