@@ -1,4 +1,4 @@
-import sqlite3
+
 from tkinter import messagebox
 from tkinter import ttk
 from subprocess import call
@@ -6,7 +6,8 @@ from CTkMessagebox import CTkMessagebox, ctkmessagebox
 import customtkinter as ctk
 import random
 from customtkinter import CTkButton
-from PIL import Image, ImageTk
+from PIL import Image
+
 
 
 # Food, sides, and drinks corresponding to each diet
@@ -119,6 +120,8 @@ enable_high_dpi_awareness()
 # set_dark_mode()
 ctk.set_appearance_mode("dark")
 
+current_user_label = ctk.CTkLabel(toolbar, text=current_user)
+current_user_label.place(x=50, y=50)
 
 account_icon = ctk.CTkImage(Image.open("account_icon.png"))
 account_icon._size = 150, 100
@@ -204,6 +207,4 @@ for day in meal_schedule.keys():
     day_label.pack(anchor="w")
     day_labels[day] = day_label  # Store the label in the dictionary
 
-# Start the Tkinter loop
-if __name__ == '__main__':
-    root.mainloop()
+root.mainloop()
