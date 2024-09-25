@@ -1,13 +1,14 @@
 import sqlite3
-from CTkMessagebox import CTkMessagebox, ctkmessagebox
+from CTkMessagebox import CTkMessagebox
 import customtkinter as ctk
 from tkinter import messagebox
-from PIL import Image, ImageTk
+from PIL import Image
 from subprocess import call
 import argon2
 import re
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+
 
 # CHECKS THAT A VALID EMAIL HAS BEEN ENTERED
 def check(email):
@@ -54,10 +55,10 @@ def register():
         except:
             messagebox.showerror("Connection Error", "Connection not established")
 
-
         try:
 
-            command = "create table users (user int auto_increment key not null, Username varchar(255), Password varchar(255), Email varchar(319)"
+            command = ("create table users (user int auto_increment key not null,"
+                       " Username varchar(255), Password varchar(255), Email varchar(319)")
             mycursor.execute(command)
 
         except:
@@ -79,7 +80,8 @@ def register():
 
 
 # IMPORTS THE LOGIN SCREEN LOGO
-main_menu_logo = ctk.CTkImage(light_image=Image.open("main_menu_logo.png"), dark_image=Image.open("main_menu_logo.png"), size=(200, 200))
+main_menu_logo = ctk.CTkImage(light_image=Image.open("main_menu_logo.png"),
+                              dark_image=Image.open("main_menu_logo.png"), size=(200, 200))
 
 # CREATES THE REGISTRATION WINDOW
 root = ctk.CTk()
@@ -132,18 +134,20 @@ password_icon_label.place(x=60, y=350)
 
 # CREATES AND PLACES AN ENTRY TELLING THE USER TO REENTER THE PASSWORD THEY CHOSE
 # ENSURING THAT BOTH PASSWORDS MATCH
-check_password_entry = ctk.CTkEntry(root, font=("Helvetica", 15, "bold"), width=220, placeholder_text="Reenter password")
+check_password_entry = ctk.CTkEntry(root,
+                                    font=("Helvetica", 15, "bold"), width=220, placeholder_text="Reenter password")
 check_password_entry.place(x=90, y=390)
 check_password_entry.bind("<Key-space>", lambda e: "break")
 
 # CREATES AND PLACES A BUTTON THAT ALLOWS USERS TO COMPLETE THE ACCOUNT CREATION PROCESS
-sign_up_button = ctk.CTkButton(root, text="Sign Up", fg_color="#FF8433", hover_color="#FF6500", font=("Arial", 20, "bold"), command=register)
+sign_up_button = ctk.CTkButton(root, text="Sign Up",
+                               fg_color="#FF8433", hover_color="#FF6500", font=("Arial", 20, "bold"), command=register)
 sign_up_button.place(x=129, y=440)
 
 # CREATES AND PLACES A BUTTON THAT TAKES USERS BACK TO THE LOGIN SCREEN
-login_button = ctk.CTkButton(root, text="Existing User?", fg_color="#FF8433", hover_color="#FF6500", font=("Arial", 20, "bold"), command=login)
+login_button = ctk.CTkButton(root, text="Existing User?",
+                             fg_color="#FF8433", hover_color="#FF6500", font=("Arial", 20, "bold"), command=login)
 login_button.place(x=122, y=480)
 
 
 root.mainloop()
-
