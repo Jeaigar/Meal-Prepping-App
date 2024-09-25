@@ -101,19 +101,45 @@ class SummaryPage(ctk.CTkFrame):
 class AIPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent)
-        button = ctk.CTkButton(self, text='AI Page')
-        button.place(x=300, y=250)
-
-        API_KEY = open("API_KEY.txt", 'r').read()
-        openai.api_key = API_KEY
 
         def ai_chat(prompt):
             response = openai.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}]
+                messages=[{"role": "user", "content": prompt},
+                          {"role": "assistant", "content": "Ask more questions"},
+                          {"role": "assistant", "content": "Be less formal."}],
+                temperature=0.8,
+                max_tokens=200,
+                frequency_penalty=0.5,
+                presence_penalty=0.5,
+
             )
 
             return response.choices[0].message.content.strip()
+
+
+        response_label = ctk.CTkLabel(self, text='', bg_color='dark gray', height=300, width=600)
+        response_label.place(x=50, y=30)
+
+        user_entry_box = ctk.CTkEntry(self, height=100, width=500, font=("Arial", 40, 'bold'))
+        user_entry_box.place(x=50, y=400)
+
+        ask_button = ctk.CTkButton(self, text='Ask AI',
+                                   fg_color="#FF8433", hover_color="#FF6500",
+                                   height=30, width=300, font=("Arial", 20, 'bold'), command=lambda: ask_ai(user_entry_box.get(), response_label))
+        ask_button.place(x=50, y=500)
+
+        def ask_ai(user, label):
+            response = ai_chat(user)
+            label.configure(text=response)
+            user_entry_box.delete(0, 'end')
+
+
+        API_KEY = open("API_KEY.txt", 'r').read()
+        openai.api_key = API_KEY
+
+
+
 
 
 class PlanPage(ctk.CTkFrame):
