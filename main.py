@@ -25,7 +25,6 @@ def logout():
 
 
 # Set dark mode
-# set_dark_mode()
 ctk.set_appearance_mode("dark")
 
 
@@ -53,10 +52,6 @@ class Main(ctk.CTk):
             frame.place(x=0, y=0)
 
         self.show_frames(SummaryPage)
-
-    def show_frames(self, cont):
-        frame = self.frames[cont]
-        frame.tkraise()
 
         toolbar = ctk.CTkFrame(self, height=500, width=200)
         toolbar.place(x=25, y=50)
@@ -89,6 +84,10 @@ class Main(ctk.CTk):
         # CREATES AND PLACES SEPARATOR BETWEEN TOOL BAR ON THE LEFT SIDE AND THE RIGHT SIDE
         sep_frame = ctk.CTkFrame(self, height=500, width=1, bg_color='gray')
         sep_frame.place(x=250, y=50)
+
+    def show_frames(self, cont):
+        frame = self.frames[cont]
+        frame.tkraise()
 
 
 class SummaryPage(ctk.CTkFrame):
@@ -137,9 +136,6 @@ class AIPage(ctk.CTkFrame):
 
         API_KEY = open("API_KEY.txt", 'r').read()
         openai.api_key = API_KEY
-
-
-
 
 
 class PlanPage(ctk.CTkFrame):
