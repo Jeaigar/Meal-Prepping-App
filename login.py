@@ -90,12 +90,12 @@ def loginuser(event):
                 fetched_password = myresult[2]
                 ph.verify(fetched_password, password)
                 print('Password verified!')
-                global current_user
                 current_user = username
                 print(current_user)
                 messagebox.showinfo("Login", "Login successful!")
                 login.destroy()
                 call(['python', 'main.py'])
+
 
             except:
                 CTkMessagebox(title="Error", message="Invalid username or password!", icon='warning', sound=True)
@@ -150,8 +150,8 @@ if __name__ == '__main__':
     name_icon_label.place(x=70, y=255)
 
     # CREATES AND PLACES THE ENTRY FOR USERS TO ENTER THEIR PASSWORD
-    password_entry = ctk.CTkEntry(login, font=("Arial", 15, "bold"), width=200)
-    password_entry.insert(0, 'Password')
+    password_entry = ctk.CTkEntry(login, font=("Arial", 15, "bold"), width=200, placeholder_text='Password', show='*', placeholder_text_color='white')
+    # password_entry.insert(0, 'Password')
     password_entry.bind("<FocusIn>", password_enter)
     password_entry.bind("<FocusOut>", password_leave)
     password_entry.bind("<Key-space>", lambda e: "break")
@@ -178,10 +178,10 @@ if __name__ == '__main__':
     closedeye = closedeye.resize((18, 12))
     closedeye = ImageTk.PhotoImage(closedeye)
 
-    button_mode = True
+    button_mode = False
 
     # CREATES AND PLACES THE OPEN/CLOSED EYE BUTTON FOR PASSWORD ENTRY
-    eye_button = tk.Button(login, image=openeye, bd=0, bg="#343434", command=hide)
+    eye_button = tk.Button(login, image=closedeye, bd=0, bg="#343434", command=hide)
     eye_button.place(x=260, y=297)
 
     # CREATES AND PLACES THE "REMEMBER ME" CHECKBOX

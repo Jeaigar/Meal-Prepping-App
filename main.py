@@ -106,7 +106,8 @@ class AIPage(ctk.CTkFrame):
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt},
                           {"role": "assistant", "content": "Ask more questions"},
-                          {"role": "assistant", "content": "Be less formal."}],
+                          {"role": "assistant", "content": "Be less formal."},
+                          {"role": "assistant", "content": "Respond with 20 words or less."},],
                 temperature=0.8,
                 max_tokens=200,
                 frequency_penalty=0.5,
@@ -125,7 +126,8 @@ class AIPage(ctk.CTkFrame):
 
         ask_button = ctk.CTkButton(self, text='Ask AI',
                                    fg_color="#FF8433", hover_color="#FF6500",
-                                   height=30, width=300, font=("Arial", 20, 'bold'), command=lambda: ask_ai(user_entry_box.get(), response_label))
+                                   height=30, width=300, font=("Arial", 20, 'bold'),
+                                   command=lambda: ask_ai(user_entry_box.get(), response_label))
         ask_button.place(x=50, y=500)
 
         def ask_ai(user, label):
@@ -138,6 +140,8 @@ class AIPage(ctk.CTkFrame):
         openai.api_key = API_KEY
 
 
+
+
 class PlanPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent)
@@ -145,7 +149,8 @@ class PlanPage(ctk.CTkFrame):
         # Food, sides, and drinks corresponding to each diet
         food_options = {
             "None": ["Pizza", "Burger", "Burrito"],
-            "Vegetarian": ["Grilled Vegetables", "Vegetable Stir Fry", "Lentil Soup"],
+            "Vegetarian": ["Grilled Vegetables", "Vegetable Stir Fry",
+                           "Lentil Soup", "Vegetarian Lasagna", "Falafel", "Veggie Burger", "Eggplant Parmesan"],
             "Vegan": ["Vegan Pasta", "Tofu Salad", "Chickpea Curry"],
             "Keto": ["Grilled Chicken", "Salmon", "Avocado Salad"],
             "Paleo": ["Steak", "Sweet Potato", "Chicken Salad"]
