@@ -144,6 +144,14 @@ class AIPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent)
 
+        def ask_ai(user, label):
+            response = ai_chat(user)
+            label.configure(text=response)
+            user_entry_box.delete(0, 'end')
+
+        API_KEY = open("API_KEY.txt", 'r').read()
+        openai.api_key = API_KEY
+
         def ai_chat(prompt):
             response = openai.chat.completions.create(
                 model="gpt-3.5-turbo",
@@ -172,17 +180,6 @@ class AIPage(ctk.CTkFrame):
                                    height=30, width=300, font=("Arial", 20, 'bold'),
                                    command=lambda: ask_ai(user_entry_box.get(), response_label))
         ask_button.place(x=50, y=500)
-
-        def ask_ai(user, label):
-            response = ai_chat(user)
-            label.configure(text=response)
-            user_entry_box.delete(0, 'end')
-
-
-        API_KEY = open("API_KEY.txt", 'r').read()
-        openai.api_key = API_KEY
-
-
 
 
 class PlanPage(ctk.CTkFrame):
