@@ -58,7 +58,7 @@ def register():
         try:
 
             command = ("create table users (user int auto_increment key not null,"
-                       " Username varchar(255), Password varchar(255), Email varchar(319)")
+                       " Username varchar(255), Password varchar(255), Email varchar(319), LoggedIn int)")
             mycursor.execute(command)
 
         except:
@@ -69,9 +69,9 @@ def register():
             ph.hash(password)
             hashed_password = ph.hash(password)
 
-            command = "insert into users (Username, Password, Email) values (?, ?, ?)"
+            command = "insert into users (Username, Password, Email, LoggedIn) values (?, ?, ?, ?)"
 
-            mycursor.execute(command, (username, hashed_password, email))
+            mycursor.execute(command, (username, hashed_password, email, 0))
             users.commit()
             users.close()
             messagebox.showinfo("Register", "New account has been created successfully!")

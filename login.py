@@ -49,13 +49,11 @@ def hide():
 # RETURNS ENCRYPTED PASSWORD FROM DATABASE AND COMPARES IT TO THE PASSWORD ENTERED (BOOL)
 # IF TRUE , THE LOGIN IS SUCCESSFUL
 # IF FALSE, THE USER IS PROMPTED WITH "INVALID USERNAME OR PASSWORD"
-current_user = None
 
 
 def loginuser(event):
     username = username_entry.get()
     password = password_entry.get()
-    global current_user
     if (username == "" or username == "Username") or (password == "" or password == "Password"):
         CTkMessagebox(title="Error", message="Enter a valid username and password!", icon='warning', sound=True)
 
@@ -77,6 +75,11 @@ def loginuser(event):
 
         myresult = mycursor.fetchone()
 
+        command = "update users set LoggedIn = 1 where Username = ?"
+        mycursor.execute(command, (username,))
+
+        users.commit()
+        users.close()
         # FOR DEBUG
         # print(myresult)
         # print(f'Password : {fetched_password}')
@@ -90,8 +93,6 @@ def loginuser(event):
                 fetched_password = myresult[2]
                 ph.verify(fetched_password, password)
                 print('Password verified!')
-                current_user = username
-                print(current_user)
                 messagebox.showinfo("Login", "Login successful!")
                 login.destroy()
                 call(['python', 'main.py'])

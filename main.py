@@ -5,10 +5,8 @@ import customtkinter as ctk
 import random
 from customtkinter import CTkButton
 from PIL import Image
-from login import current_user
 import openai
-
-print(current_user)
+import sqlite3
 
 
 def clear_frame(frame):
@@ -16,7 +14,29 @@ def clear_frame(frame):
         widget.destroy()
 
 
+def exit_button(window):
+
+    users = sqlite3.connect('login.db')
+    mycursor = users.cursor()
+
+    command = "update users set LoggedIn = 0 where LoggedIn = 1"
+    mycursor.execute(command)
+    users.commit()
+    users.close()
+
+    window.destroy()
+
+
 def logout():
+
+    users = sqlite3.connect('login.db')
+    mycursor = users.cursor()
+
+    command = "update users set LoggedIn = 0 where LoggedIn = 1"
+    mycursor.execute(command)
+    users.commit()
+    users.close()
+
     messagebox.showinfo("Logout", "Logging out...")
 
     run.destroy()
@@ -37,6 +57,21 @@ class Main(ctk.CTk):
         self.resizable(False, False)
         self.wm_iconbitmap('appicon.ico')
         self.eval("tk::PlaceWindow . center")
+        self.protocol("WM_DELETE_WINDOW", lambda: exit_button(self))
+
+        # CONNECTS TO DATABASE
+        users = sqlite3.connect('login.db')
+        mycursor = users.cursor()
+
+        # FINDS THE USER THAT IS CURRENTLY LOGGED IN
+        command = "select * from users where LoggedIn = 1"
+        mycursor.execute(command)
+
+        # GETS THE CURRENTLY LOGGED IN USER INFO
+        result = mycursor.fetchone()
+
+        # GETS THE CURRENTLY LOGGED IN USER AND ASSIGNS IT TO "logged_in_user" VARIABLE
+        logged_in_user = result[1]
 
         # CREATES AND PLACES FRAME FOR WIDGETS ON THE RIGHT SIDE
         container = ctk.CTkFrame(self, height=550, width=710)
@@ -53,38 +88,46 @@ class Main(ctk.CTk):
 
         self.show_frames(SummaryPage)
 
+        # CREATES TOOLBAR THAT HOLDS MAIN PAGE BUTTONS, NAME LABEL, AND PROFILE PICTURE
         toolbar = ctk.CTkFrame(self, height=500, width=200)
         toolbar.place(x=25, y=50)
 
+        # OPENS PROFILE PICTURE AND DISPLAYS IT IN THE TOOLABR
         account_icon = ctk.CTkImage(Image.open("account_icon.png"))
         account_icon._size = 150, 100
         account_icon_label = ctk.CTkLabel(toolbar, image=account_icon, text='')
         account_icon_label.place(anchor='nw', y=20, x=25)
 
         # BUTTON THAT ALLOWS USER TO SIGN OUT OF THEIR ACCOUNT
-        sign_out = CTkButton(toolbar, text="Sign Out", command=logout, height=30, width=20, fg_color='dark red',
+        sign_out = CTkButton(toolbar, text="Sign Out", command=logout, height=30, width=20,
+                             fg_color='dark red', hover_color= 'green',
                              font=("Arial", 12, 'bold'))
-        sign_out.place(anchor='nw', y=140, x=70)
+        sign_out.place(anchor='nw', y=170, x=70)
+
+        # LABEL THAT SHOWS THE CURRENTLY LOGGED IN USER
+        name_label = ctk.CTkLabel(toolbar, text=logged_in_user, font=("Helvetica", 23, 'bold'), width=200)
+        name_label.place(anchor='sw', y=160, x=0)
 
         # SHOWS AN OVERVIEW OF THE USERS MEALS
         summary_button = ctk.CTkButton(toolbar, command=lambda: self.show_frames(SummaryPage), text="Summary",
                                        font=('Helvetica', 20, 'bold'), fg_color="#FF8433", hover_color="#FF6500")
-        summary_button.place(anchor='nw', y=200, x=25)
+        summary_button.place(anchor='nw', y=225, x=30)
 
         # TAKES USERS TO MEAL PLAN PAGE
         plan_meal_button = ctk.CTkButton(toolbar, command=lambda: self.show_frames(PlanPage), text="Plan Your Meal",
                                          font=('Helvetica', 15, 'bold'), fg_color="#FF8433", hover_color="#FF6500")
-        plan_meal_button.place(anchor='nw', y=250, x=25)
+        plan_meal_button.place(anchor='nw', y=275, x=30)
 
         # OPENS PROMPT FOR USERS TO ASK AI FOR MEAL SUGGESTIONS
         ask_button = ctk.CTkButton(toolbar, command=lambda: self.show_frames(AIPage), text="Not sure? Ask AI",
                                    font=('Helvetica', 15, 'bold'), fg_color="#FF8433", hover_color="#FF6500")
-        ask_button.place(anchor='nw', y=300, x=25)
+        ask_button.place(anchor='nw', y=325, x=30)
 
         # CREATES AND PLACES SEPARATOR BETWEEN TOOL BAR ON THE LEFT SIDE AND THE RIGHT SIDE
         sep_frame = ctk.CTkFrame(self, height=500, width=1, bg_color='gray')
         sep_frame.place(x=250, y=50)
 
+    # FUNCTION THAT RAISES FRAMES (OPENS NEW FRAME WHEN BUTTON IS PRESSED)
     def show_frames(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
