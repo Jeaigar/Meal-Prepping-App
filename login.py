@@ -113,6 +113,19 @@ def enable_high_dpi_awareness():
         pass
 
 
+def exit_button(window):
+
+    users = sqlite3.connect('login.db')
+    mycursor = users.cursor()
+
+    command = "update users set LoggedIn = 0 where LoggedIn = 1"
+    mycursor.execute(command)
+    users.commit()
+    users.close()
+
+    window.destroy()
+
+
 if __name__ == '__main__':
     # IMPORTS THE LOGIN SCREEN LOGO
     main_menu_logo = ctk.CTkImage(light_image=Image.open("main_menu_logo.png"),
@@ -125,6 +138,7 @@ if __name__ == '__main__':
     login.iconbitmap(r"appicon.ico")
     login.resizable(False, False)
     login.eval("tk::PlaceWindow . center")
+    login.protocol("WM_DELETE_WINDOW", lambda: exit_button(login))
 
     # Enable DPI scaling
     enable_high_dpi_awareness()
