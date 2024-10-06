@@ -4,9 +4,10 @@ from CTkMessagebox import CTkMessagebox
 import customtkinter as ctk
 import random
 from customtkinter import CTkButton
-from PIL import Image
+from PIL import Image, ImageTk
 import openai
 import sqlite3
+
 
 
 def clear_frame(frame):
@@ -59,6 +60,13 @@ class Main(ctk.CTk):
         self.eval("tk::PlaceWindow . center")
         self.protocol("WM_DELETE_WINDOW", lambda: exit_button(self))
 
+        self.bg = Image.open('main_bg.png')
+        self.bg = ctk.CTkImage(self.bg, size=(1000, 600))
+
+        bg_label = ctk.CTkLabel(self, image=self.bg)
+        bg_label.place(x=0, y=0)
+
+
         # CONNECTS TO DATABASE
         users = sqlite3.connect('login.db')
         mycursor = users.cursor()
@@ -71,7 +79,7 @@ class Main(ctk.CTk):
         result = mycursor.fetchone()
 
         # GETS THE CURRENTLY LOGGED IN USER AND ASSIGNS IT TO "logged_in_user" VARIABLE
-        logged_in_user = result[1]
+        # logged_in_user = result[1]
 
         # CREATES AND PLACES FRAME FOR WIDGETS ON THE RIGHT SIDE
         container = ctk.CTkFrame(self, height=550, width=710)
@@ -79,9 +87,9 @@ class Main(ctk.CTk):
 
         self.frames = {}
 
-        for F in (AIPage, SummaryPage, PlanPage):
+        for F in (AIPage, SummaryPage, PlanPage, CalcPage):
             frame = F(container, self)
-            frame.configure(height=550, width=710)
+            frame.configure(height=550, width=710, bg_color='#232323', fg_color='#2B2B2B')
 
             self.frames[F] = frame
             frame.place(x=0, y=0)
@@ -92,7 +100,7 @@ class Main(ctk.CTk):
         toolbar = ctk.CTkFrame(self, height=500, width=200)
         toolbar.place(x=25, y=50)
 
-        # OPENS PROFILE PICTURE AND DISPLAYS IT IN THE TOOLABR
+        # OPENS PROFILE PICTURE AND DISPLAYS IT IN THE TOOLBAR
         account_icon = ctk.CTkImage(Image.open("account_icon.png"))
         account_icon._size = 150, 100
         account_icon_label = ctk.CTkLabel(toolbar, image=account_icon, text='')
@@ -105,7 +113,7 @@ class Main(ctk.CTk):
         sign_out.place(anchor='nw', y=170, x=70)
 
         # LABEL THAT SHOWS THE CURRENTLY LOGGED IN USER
-        name_label = ctk.CTkLabel(toolbar, text=logged_in_user, font=("Helvetica", 23, 'bold'), width=200)
+        name_label = ctk.CTkLabel(toolbar, text='logged_in_user', font=("Helvetica", 23, 'bold'), width=200)
         name_label.place(anchor='sw', y=160, x=0)
 
         # SHOWS AN OVERVIEW OF THE USERS MEALS
@@ -124,8 +132,8 @@ class Main(ctk.CTk):
         ask_button.place(anchor='nw', y=325, x=30)
 
         # CREATES AND PLACES SEPARATOR BETWEEN TOOL BAR ON THE LEFT SIDE AND THE RIGHT SIDE
-        sep_frame = ctk.CTkFrame(self, height=500, width=1, bg_color='gray')
-        sep_frame.place(x=250, y=50)
+        # sep_frame = ctk.CTkFrame(self, height=500, width=1)
+        # sep_frame.place(x=250, y=50)
 
     # FUNCTION THAT RAISES FRAMES (OPENS NEW FRAME WHEN BUTTON IS PRESSED)
     def show_frames(self, cont):
@@ -136,7 +144,7 @@ class Main(ctk.CTk):
 class SummaryPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent)
-        button = ctk.CTkButton(self, text='Summary')
+        button = ctk.CTkButton(self, text='Summary', command=lambda: controller.show_frames(CalcPage))
         button.place(x=50, y=50)
 
 
@@ -144,21 +152,14 @@ class AIPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent)
 
-        def ask_ai(user, label):
-            response = ai_chat(user)
-            label.configure(text=response)
-            user_entry_box.delete(0, 'end')
-
-        API_KEY = open("API_KEY.txt", 'r').read()
-        openai.api_key = API_KEY
-
         def ai_chat(prompt):
             response = openai.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt},
                           {"role": "assistant", "content": "Ask more questions"},
                           {"role": "assistant", "content": "Be less formal."},
-                          {"role": "assistant", "content": "Respond with 20 words or less."},],
+                          {"role": "assistant", "content": "Respond with 20 words or less."},
+                          {"role": "assistant", "content": "You are a professional nutritionist"},],
                 temperature=0.8,
                 max_tokens=200,
                 frequency_penalty=0.5,
@@ -168,6 +169,13 @@ class AIPage(ctk.CTkFrame):
 
             return response.choices[0].message.content.strip()
 
+        def ask_ai(user, label):
+            response = ai_chat(user)
+            label.configure(text=response)
+            user_entry_box.delete(0, 'end')
+
+        API_KEY = open("API_KEY.txt", 'r').read()
+        openai.api_key = API_KEY
 
         response_label = ctk.CTkLabel(self, text='', bg_color='dark gray', height=300, width=600)
         response_label.place(x=50, y=30)
@@ -303,6 +311,14 @@ class PlanPage(ctk.CTkFrame):
             day_label = ctk.CTkLabel(days_frame, text=f"{day}: -not set-")
             day_label.pack(anchor="w")
             day_labels[day] = day_label  # Store the label in the dictionary
+
+
+class CalcPage(ctk.CTkFrame):
+    def __init__(self, parent, controller):
+        ctk.CTkFrame.__init__(self, parent)
+
+        button = ctk.CTkButton(self, text="Calculate", command=lambda: controller.show_frames(SummaryPage))
+        button.place(anchor='nw', y=100, x=250)
 
 
 if __name__ == '__main__':
