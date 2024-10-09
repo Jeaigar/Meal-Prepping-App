@@ -7,6 +7,7 @@ from subprocess import call
 import argon2
 import re
 
+# INPUT VALIDATION FOR VALID EMAIL FORMAT
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
 
@@ -100,12 +101,15 @@ icon_label.place(x=100, y=20)
 title_label = ctk.CTkLabel(root, text="Create Account", font=("Helvetica", 30, "bold"))
 title_label.place(x=90, y=225)
 
+# CREATES AND PLACES THE EMAIL ENTRY BOX
 email_entry = ctk.CTkEntry(root, placeholder_text="Email", font=("Helvetica", 15, "bold"), width=220)
 email_entry.place(x=90, y=270)
 
+# CREATES THE EMAIL ICON
 email_icon = ctk.CTkImage(Image.open('email_icon.png'))
 email_icon._size = 25, 25
 
+# CREATES AND PLACES THE EMAIL ICON AND LABEL
 email_icon_label = ctk.CTkLabel(root, text="", font=("Helvetica", 15, "bold"), image=email_icon)
 email_icon_label.place(x=60, y=270)
 
@@ -115,9 +119,11 @@ username_entry = ctk.CTkEntry(root, placeholder_text="Username", font=("Helvetic
 username_entry.place(x=90, y=310)
 username_entry.bind("<Key-space>", lambda e: "break")
 
+# CREATES THE USER ICON
 user_icon = ctk.CTkImage(Image.open('name_icon.png'))
 user_icon._size = 25, 25
 
+# CREATES AND PLACES THE USER ICON AND LABEL
 user_icon_label = ctk.CTkLabel(root, text="", font=("Helvetica", 15, "bold"), image=user_icon)
 user_icon_label.place(x=60, y=310)
 
@@ -126,9 +132,11 @@ password_entry = ctk.CTkEntry(root, font=("Helvetica", 15, "bold"), width=220, p
 password_entry.place(x=90, y=350)
 password_entry.bind("<Key-space>", lambda e: "break")
 
+# CREATES THE PASSWORD ICON
 password_icon = ctk.CTkImage(Image.open('pass_icon.png'))
 password_icon._size = 25, 25
 
+# CREATES AND PLACES THE PASSWORD ICON AND LABEL
 password_icon_label = ctk.CTkLabel(root, text="", font=("Helvetica", 15, "bold"), image=password_icon)
 password_icon_label.place(x=60, y=350)
 

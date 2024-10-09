@@ -9,12 +9,13 @@ import openai
 import sqlite3
 
 
-
+# FUNCTION THAT REMOVES ALL WIDGETS FROM A GIVEN FRAME
 def clear_frame(frame):
     for widget in frame.winfo_children():
         widget.destroy()
 
 
+# FUNCTION THAT EXECUTES WHEN A USER CLOSES THE MAIN WINDOW INSTEAD OF CLICKING SIGN OUT
 def exit_button(window):
 
     users = sqlite3.connect('login.db')
@@ -28,6 +29,7 @@ def exit_button(window):
     window.destroy()
 
 
+# FUNCTION THAT SUCCESSFULLY LOGS A USER OUT OF THE APP
 def logout():
 
     users = sqlite3.connect('login.db')
@@ -49,6 +51,7 @@ def logout():
 ctk.set_appearance_mode("dark")
 
 
+# CREATES THE MAIN WINDOW AND TOOLBAR
 class Main(ctk.CTk):
     def __init__(self, *args, **kwargs):
         ctk.CTk.__init__(self, *args, **kwargs)
@@ -79,7 +82,7 @@ class Main(ctk.CTk):
         result = mycursor.fetchone()
 
         # GETS THE CURRENTLY LOGGED IN USER AND ASSIGNS IT TO "logged_in_user" VARIABLE
-        # logged_in_user = result[1]
+        logged_in_user = result[1]
 
         # CREATES AND PLACES FRAME FOR WIDGETS ON THE RIGHT SIDE
         container = ctk.CTkFrame(self, height=550, width=710)
@@ -87,7 +90,7 @@ class Main(ctk.CTk):
 
         self.frames = {}
 
-        for F in (AIPage, SummaryPage, PlanPage, CalcPage):
+        for F in (AIPage, SummaryPage, PlanPage, PlannedMealsPage):
             frame = F(container, self)
             frame.configure(height=550, width=710, bg_color='#232323', fg_color='#2B2B2B')
 
@@ -108,31 +111,30 @@ class Main(ctk.CTk):
 
         # BUTTON THAT ALLOWS USER TO SIGN OUT OF THEIR ACCOUNT
         sign_out = CTkButton(toolbar, text="Sign Out", command=logout, height=30, width=20,
-                             fg_color='dark red', hover_color= 'green',
+                             fg_color='dark red', hover_color= '#ba00f5',
                              font=("Arial", 12, 'bold'))
         sign_out.place(anchor='nw', y=170, x=70)
 
         # LABEL THAT SHOWS THE CURRENTLY LOGGED IN USER
-        name_label = ctk.CTkLabel(toolbar, text='logged_in_user', font=("Helvetica", 23, 'bold'), width=200)
+        name_label = ctk.CTkLabel(toolbar, text= logged_in_user, font=("Helvetica", 23, 'bold'), width=200)
         name_label.place(anchor='sw', y=160, x=0)
 
         # SHOWS AN OVERVIEW OF THE USERS MEALS
         summary_button = ctk.CTkButton(toolbar, command=lambda: self.show_frames(SummaryPage), text="Summary",
-                                       font=('Helvetica', 20, 'bold'), fg_color="#FF8433", hover_color="#FF6500")
+                                       font=('Helvetica', 20, 'bold'), fg_color="#FF8433", hover_color="#ba00f5")
         summary_button.place(anchor='nw', y=225, x=30)
 
-        # TAKES USERS TO MEAL PLAN PAGE
-        plan_meal_button = ctk.CTkButton(toolbar, command=lambda: self.show_frames(PlanPage), text="Plan Your Meal",
-                                         font=('Helvetica', 15, 'bold'), fg_color="#FF8433", hover_color="#FF6500")
+        plan_meal_button = ctk.CTkButton(toolbar, command=lambda: self.show_frames(PlannedMealsPage), text="Planned Meals",
+                                         font=('Helvetica', 15, 'bold'), fg_color="#FF8433", hover_color= "#ba00f5")
         plan_meal_button.place(anchor='nw', y=275, x=30)
 
         # OPENS PROMPT FOR USERS TO ASK AI FOR MEAL SUGGESTIONS
         ask_button = ctk.CTkButton(toolbar, command=lambda: self.show_frames(AIPage), text="Not sure? Ask AI",
-                                   font=('Helvetica', 15, 'bold'), fg_color="#FF8433", hover_color="#FF6500")
+                                   font=('Helvetica', 15, 'bold'), fg_color="#FF8433", hover_color= "#ba00f5")
         ask_button.place(anchor='nw', y=325, x=30)
 
         # CREATES AND PLACES SEPARATOR BETWEEN TOOL BAR ON THE LEFT SIDE AND THE RIGHT SIDE
-        # sep_frame = ctk.CTkFrame(self, height=500, width=1)
+        # sep_frame = ctk.CTkFrame(self, height=500, width=10)
         # sep_frame.place(x=250, y=50)
 
     # FUNCTION THAT RAISES FRAMES (OPENS NEW FRAME WHEN BUTTON IS PRESSED)
@@ -141,24 +143,29 @@ class Main(ctk.CTk):
         frame.tkraise()
 
 
+# CREATES SUMMARY PAGE
 class SummaryPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent)
-        button = ctk.CTkButton(self, text='Summary', command=lambda: controller.show_frames(CalcPage))
-        button.place(x=50, y=50)
+        # CREATES AND PLACES A LABEL WELCOMING THE USER
+        label = ctk.CTkLabel(self, text='Welcome to MealCraft!\nWith our help, you will be able '
+                                        'to create and\n organize weekly meal plans, track groceries, '
+                                        'and discover new recipes.', font=("Arial", 20, 'bold'))
+        label.place(x=15, y=200)
 
 
+# CREATES ASK AI PAGE
 class AIPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent)
-
+        # FUNCTION THAT CONNECTS TO OPENAI
         def ai_chat(prompt):
             response = openai.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt},
-                          {"role": "assistant", "content": "Ask more questions"},
-                          {"role": "assistant", "content": "Be less formal."},
-                          {"role": "assistant", "content": "Respond with 20 words or less."},
+                          {"role": "system", "content": "Ask more questions"},
+                          {"role": "system", "content": "Be more formal."},
+                          {"role": "system", "content": "Respond with 50 words or less."},
                           {"role": "assistant", "content": "You are a professional nutritionist"},],
                 temperature=0.8,
                 max_tokens=200,
@@ -169,27 +176,37 @@ class AIPage(ctk.CTkFrame):
 
             return response.choices[0].message.content.strip()
 
+        # FUNCTION THAT PASSES THROUGH WHAT THE USER ENTERS TO OPENAI
         def ask_ai(user, label):
             response = ai_chat(user)
             label.configure(text=response)
             user_entry_box.delete(0, 'end')
 
+        # READS THE API KEY STORED IN A TEXT FILE
         API_KEY = open("API_KEY.txt", 'r').read()
         openai.api_key = API_KEY
 
-        response_label = ctk.CTkLabel(self, text='', bg_color='dark gray', height=300, width=600)
+        # CREATES AND PLACES A FRAME THAT HOLDS THE RESPONSE LABEL
+        response_frame = ctk.CTkFrame(self,height=650, width=710)
+        response_frame.place(x=10, y=10)
+
+        # CREATES AND PLACES THE RESPONSE LABEL THAT HOLDS THE RESPONSE FROM CHATGPT
+        response_label = ctk.CTkLabel(response_frame, text='Hello! How can I assist you today?', bg_color='#232323', height=400, width=600, justify=ctk.LEFT, wraplength=250, font=("Arial", 14))
         response_label.place(x=50, y=30)
 
-        user_entry_box = ctk.CTkEntry(self, height=100, width=500, font=("Arial", 40, 'bold'))
-        user_entry_box.place(x=50, y=400)
+        # CREATES AND PLACES AN ENTRY BOX WHERE THE USER ASKS CHATGPT A QUESTION
+        user_entry_box = ctk.CTkEntry(self, height=28, width=500, font=("Arial", 20, 'bold'))
+        user_entry_box.place(x=100, y=470)
 
+        # CREATES AND PLACES A BUTTON THAT EXECUTES THE ASK_AI FUNCTION
         ask_button = ctk.CTkButton(self, text='Ask AI',
-                                   fg_color="#FF8433", hover_color="#FF6500",
-                                   height=30, width=300, font=("Arial", 20, 'bold'),
+                                   fg_color="#FF8433", hover_color="#ba00f5",
+                                   height=30, width=100, font=("Arial", 20, 'bold'),
                                    command=lambda: ask_ai(user_entry_box.get(), response_label))
-        ask_button.place(x=50, y=500)
+        ask_button.place(x=290, y=510)
 
 
+# CREATES THE PLAN YOUR MEAL PAGE
 class PlanPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent)
@@ -284,12 +301,12 @@ class PlanPage(ctk.CTkFrame):
 
         # Finalize Meal Button
         ctk.CTkButton(self, text="Finalize Meal", font=('Helvetica', 15, 'bold'),
-                      fg_color="#FF8433", hover_color="#FF6500",
+                      fg_color="#FF8433", hover_color="#ba00f5",
                       command=finalize_meal).place(anchor='nw', y=420, x=25)
 
         # Button to randomize a meal suggestion
         ctk.CTkButton(self, text="Randomize Meal", font=('Helvetica', 15, 'bold'),
-                      fg_color="#FF8433", hover_color="#FF6500",
+                      fg_color="#FF8433", hover_color="#ba00f5",
                       command=randomize_meal).place(anchor='nw', y=460, x=25)
 
         # List to store meal selections for each day
@@ -313,12 +330,17 @@ class PlanPage(ctk.CTkFrame):
             day_labels[day] = day_label  # Store the label in the dictionary
 
 
-class CalcPage(ctk.CTkFrame):
+# CREATES THE PLANNED MEALS PAGE
+class PlannedMealsPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent)
-
-        button = ctk.CTkButton(self, text="Calculate", command=lambda: controller.show_frames(SummaryPage))
-        button.place(anchor='nw', y=100, x=250)
+        # CREATES AND PLACES A LABEL THAT INFORMS THE USERS TO CLICK A BUTTON TO SEE THEIR PLANNED MEALS
+        label = ctk.CTkLabel(self, text="To see your planned meals, click ""Plan your meal", font=('Helvetica', 15, 'bold'))
+        label.place(anchor='nw', y=225, x=200)
+        # TAKES USERS TO MEAL PLAN PAGE
+        plan_meal_button = ctk.CTkButton(self, command=lambda: controller.show_frames(PlanPage), text="Plan Your Meal",
+                                         font=('Helvetica', 15, 'bold'), fg_color="#FF8433", hover_color="#ba00f5")
+        plan_meal_button.place(anchor='nw', y=275, x=300)
 
 
 if __name__ == '__main__':

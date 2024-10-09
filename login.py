@@ -52,29 +52,43 @@ def hide():
 
 
 def loginuser(event):
+    # GETS THE USERNAME ENTERED
     username = username_entry.get()
+    # GETS THE PASSWORD ENTERED
     password = password_entry.get()
+    # INPUT VALIDATION
+    # CHECKS THAT THE USER ENTERED A VALID USERNAME AND PASSWORD
+    # CHECKS THAT THE USERNAME AND PASSWORD ENTRY ARE NOT EMPTY
     if (username == "" or username == "Username") or (password == "" or password == "Password"):
         CTkMessagebox(title="Error", message="Enter a valid username and password!", icon='warning', sound=True)
 
     else:
 
+        # TRYS TO CONNECT TO THE DATABASE
         try:
             users = sqlite3.connect('login.db')
             mycursor = users.cursor()
             print("Connected to database!")
 
+        # IF CONNECTION FAILS TO ESTABLISH,
+        # AN ERROR MESSAGE POPS UP
         except:
             CTkMessagebox(title="Error", message="Database connection not established!", icon='warning')
             return
 
+        # CREATES AN INSTANCE OF ARGON2
         ph = argon2.PasswordHasher()
 
+        # SCANS THE DATABASE AND SEARCHES FOR A USERNAME THAT MATCHES THE ONE ENTERED
         command = "select * from users where Username = ?"
+
+        # EXECUTES THE ABOVE COMMAND
         mycursor.execute(command, (username,))
 
+        # RETURNS ONE ROW FROM THE RESULTSET
         myresult = mycursor.fetchone()
 
+        # CHANGES LOGGED IN TO TRUE FOR THE ENTERED USERNAME
         command = "update users set LoggedIn = 1 where Username = ?"
         mycursor.execute(command, (username,))
 
@@ -84,17 +98,26 @@ def loginuser(event):
         # print(myresult)
         # print(f'Password : {fetched_password}')
 
+        # IF THE SCAN DOESN'T FIND A MATCH IN THE DATABASE,
+        # AN ERROR MESSAGE READING "USERNAME DOESN'T EXIST!" WILL APPEAR
         if myresult is None:
 
             CTkMessagebox(title="Error", message="Username doesn't exist!", icon='warning', sound=True)
 
         else:
             try:
+                # GETS THE STORED PASSWORD FOR THE ENTERED USERNAME
                 fetched_password = myresult[2]
+                # USES ARGON2 VERIFY METHOD TO COMPARE THE
+                # STORED HASHED PASSWORD TO THE LITERAL STRING THAT WAS ENTERED.
                 ph.verify(fetched_password, password)
+                # PRINTS PASSWORD VERIFIED IN THE TERMINAL
                 print('Password verified!')
+                # POPUP BOX THAT TELLS THE USER THAT THE LOGIN WAS SUCCESSFUL
                 messagebox.showinfo("Login", "Login successful!")
+                # EXITS THE LOGIN PAGE
                 login.destroy()
+                # LOADS THE MAIN PAGE
                 call(['python', 'main.py'])
 
 
@@ -115,14 +138,21 @@ def enable_high_dpi_awareness():
 
 def exit_button(window):
 
+    # CONNECTS TO THE DATABASE
     users = sqlite3.connect('login.db')
+
+    # CREATES A CURSOR
     mycursor = users.cursor()
 
+    # FOR THE ENTERED USER - CHANGES VALUE OF LOGGEDIN TO TRUE
     command = "update users set LoggedIn = 0 where LoggedIn = 1"
+
+    # EXECUTES THE ABOVE COMMAND
     mycursor.execute(command)
     users.commit()
     users.close()
 
+    # EXITS THE WINDOW
     window.destroy()
 
 
