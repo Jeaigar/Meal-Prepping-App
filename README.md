@@ -9,6 +9,8 @@
 
 Validation Testing:
 
+By implementing proper validation mechanisms—such as checking for valid usernames and passwords, using strong encryption methods like Argon2 for password storage, and preventing database vulnerabilities—the login system becomes a strong line of defense against unauthorized access. Thoroughly testing the login process also helps identify potential security gaps, such as improper error handling or password visibility flaws, which could expose user credentials to attackers.
+
 - user not registered:
   
 ![image](https://github.com/user-attachments/assets/47d9cdd5-7c01-455a-aee7-f58126686fac)
